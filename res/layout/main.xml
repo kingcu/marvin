@@ -4,10 +4,29 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="Hello World, Marvin"
+    <TextView  
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:gravity="center_horizontal"
+	    android:padding="10sp"
+	    android:textSize="18sp"
+	    android:text="Marvin: Encrypted SMS"
+    />
+    <TextView  
+	    android:id="@+id/compose"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:gravity="center_horizontal"
+	    android:textSize="16sp"
+	    android:text="Compose New Message"
+    />
+    <TextView  
+	    android:id="@+id/contacts"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:gravity="center_horizontal"
+	    android:textSize="16sp"
+	    android:text="View Contacts"
     />
 </LinearLayout>
 
