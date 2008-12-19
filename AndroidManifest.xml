@@ -11,5 +11,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+	<activity android:name=".ContactList"
+		android:label="Contact List">
+		<intent-filter>
+			<action android:name="android.intent.action.VIEW" />
+			<category android:name="android.intent.category.DEFAULT" />
+		</intent-filter>
+	</activity>
+	<activity android:name=".NewContact"
+		android:label="New Contact">
+		<intent-filter>
+			<action android:name="android.intent.action.VIEW" />
+			<action android:name="android.intent.category.DEFAULT" />
+		</intent-filter>
+	</activity>
     </application>
 </manifest> 

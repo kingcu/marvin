@@ -2,31 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
+    android:layout_height="fill_parent">
+    
     <TextView  
 	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:gravity="center_horizontal"
 	    android:padding="10sp"
 	    android:textSize="18sp"
-	    android:text="Marvin: Encrypted SMS"
-    />
+	    android:text="Insert New Contact"/>
     <TextView  
-	    android:id="@+id/compose"
 	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:gravity="center_horizontal"
 	    android:textSize="16sp"
-	    android:text="Compose New Message"
-    />
-    <TextView  
-	    android:id="@+id/view_contacts"
-	    android:layout_width="fill_parent" 
-	    android:layout_height="wrap_content" 
-	    android:gravity="center_horizontal"
-	    android:textSize="16sp"
-	    android:text="View Contacts"
-    />
+	    android:text="OH GOSH PUT STuFF HERE"/>
 </LinearLayout>
 
