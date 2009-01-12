@@ -68,6 +68,12 @@ public class NewContact extends Activity {
         populateForm();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mDbAdapter.close();
+    }
+
     private void saveState() {
         String fname = mFirstName.getText().toString();
         String lname = mLastName.getText().toString();

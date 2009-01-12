@@ -8,7 +8,7 @@
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
 		android:gravity="center_horizontal"
-		android:padding="10sp"
+		android:padding="10dip"
 		android:textSize="18sp"
 		android:text="Contacts!"/>
 	<TextView  
@@ -16,15 +16,16 @@
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content" 
 		android:gravity="center_horizontal"
-		android:padding="10sp"
+		android:padding="10dip"
 		android:textSize="16sp"
 		android:text="Input New Contact"/>
 
 	<ListView android:id="@android:id/list"
 		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"/>
+        android:layout_height="0dip"
+        android:layout_weight="1" />
 	<TextView android:id="@android:id/empty"
-		android:layout_width="wrap_content"
+		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:text="There are no stored contacts :("/>
 </LinearLayout>

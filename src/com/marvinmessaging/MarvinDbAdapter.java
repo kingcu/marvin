@@ -84,7 +84,7 @@ public class MarvinDbAdapter {
      */
     public Cursor getContacts() {
         return mDb.query(CONTACTS_TABLE, 
-                new String[] {KEY_ID, KEY_LAST_NAME, KEY_FIRST_NAME}, 
+                new String[] {KEY_ID, KEY_LAST_NAME, KEY_FIRST_NAME, KEY_MOB_NUM}, 
                 null, null, null, null, null);
     }
 
