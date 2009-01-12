@@ -16,15 +16,15 @@ public class Marvin extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-	TextView contacts = (TextView)findViewById(R.id.view_contacts);
-	contacts.setOnClickListener(contactsListener);
+        TextView contacts = (TextView)findViewById(R.id.view_contacts);
+        contacts.setOnClickListener(contactsListener);
     }
 
     private OnClickListener contactsListener = new OnClickListener() {
-	public void onClick(View v) {
+        public void onClick(View v) {
             Intent intent = new Intent();
             intent.setClassName("com.marvinmessaging", "com.marvinmessaging.ContactList");
             startActivity(intent);
-	}
+        }
     };
 }

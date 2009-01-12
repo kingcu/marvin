@@ -4,18 +4,62 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
     
-    <TextView  
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content">
+
+    	<TextView  
 	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:gravity="center_horizontal"
 	    android:padding="10sp"
 	    android:textSize="18sp"
 	    android:text="Insert New Contact"/>
-    <TextView  
-	    android:layout_width="fill_parent" 
-	    android:layout_height="wrap_content" 
-	    android:gravity="center_horizontal"
-	    android:textSize="16sp"
-	    android:text="OH GOSH PUT STuFF HERE"/>
-</LinearLayout>
+	</LinearLayout>
 
+	<LinearLayout android:orientation="vertical"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content" >
+
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left"
+			android:padding="5sp"
+			android:textSize="14sp"
+			android:text="First Name" />
+		<EditText android:id="@+id/contact_f_name"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1" />
+
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left"
+			android:padding="5sp"
+			android:textSize="14sp"
+			android:text="Last Name" />
+		<EditText android:id="@+id/contact_l_name"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1" />
+		
+		<TextView
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:gravity="left"
+			android:padding="5sp"
+			android:textSize="14sp"
+			android:text="Phone Number" />
+		<EditText android:id="@+id/contact_m_num"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:layout_weight="1" />
+
+		<Button android:id="@+id/contact_submit_button"
+			android:text="Insert Contact"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" />
+	</LinearLayout>
+</LinearLayout>

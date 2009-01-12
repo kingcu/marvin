@@ -11,21 +11,23 @@ import android.view.View.OnClickListener;
 import com.marvinmessaging.Contact;
 
 public class ContactList extends ListActivity {
-    private MarvinDB marvinDB;
+    private MarvinDbAdapter mDbAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.contact_list);
         
-        marvinDB = new MarvinDB(this);
+        mDbAdapter = new MarvinDbAdapter(this);
+        mDbAdapter.open();
+
         TextView newContact = (TextView)findViewById(R.id.new_contact);
         newContact.setOnClickListener(newContactListener);
         populateList();
     }
 
     private void populateList() {
-        Cursor c = marvinDB.getContacts();
+        Cursor c = mDbAdapter.getContacts();
 
         startManagingCursor(c); //let android handle cursor life
 
