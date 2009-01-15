@@ -8,13 +8,14 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content">
 
-    	<TextView  
+    <TextView 
+        android:id="@+id/contact_form_title"
 	    android:layout_width="fill_parent" 
 	    android:layout_height="wrap_content" 
 	    android:gravity="center_horizontal"
 	    android:padding="10sp"
 	    android:textSize="18sp"
-	    android:text="Insert New Contact"/>
+        android:text="@+string/contact_form_title"/>
 	</LinearLayout>
 
 	<LinearLayout android:orientation="vertical"
@@ -58,7 +59,7 @@
 			android:layout_weight="1" />
 
 		<Button android:id="@+id/contact_submit_button"
-			android:text="Insert Contact"
+            android:text="@+string/contact_form_button"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content" />
 	</LinearLayout>

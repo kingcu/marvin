@@ -17,14 +17,12 @@ public class Marvin extends Activity
         setContentView(R.layout.main);
 
         TextView contacts = (TextView)findViewById(R.id.view_contacts);
-        contacts.setOnClickListener(contactsListener);
+        contacts.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClassName("com.marvinmessaging", "com.marvinmessaging.ContactList");
+                startActivity(intent);
+            }
+        });
     }
-
-    private OnClickListener contactsListener = new OnClickListener() {
-        public void onClick(View v) {
-            Intent intent = new Intent();
-            intent.setClassName("com.marvinmessaging", "com.marvinmessaging.ContactList");
-            startActivity(intent);
-        }
-    };
 }

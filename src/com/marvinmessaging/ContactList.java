@@ -1,6 +1,7 @@
 package com.marvinmessaging;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.app.ListActivity;
 import android.app.Activity;
 import android.content.Intent;
@@ -8,12 +9,23 @@ import android.content.Context;
 import android.database.Cursor;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.view.View;
+import android.view.MenuInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.View.OnCreateContextMenuListener;
 
 public class ContactList extends ListActivity {
     private MarvinDbAdapter mDbAdapter;
+
+    protected static final int MSG_CONTACT_ITEM = Menu.FIRST;
+    protected static final int EDIT_CONTACT_ITEM = Menu.FIRST + 1;
+    protected static final int DELETE_CONTACT_ITEM = Menu.FIRST + 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,6 +44,42 @@ public class ContactList extends ListActivity {
             }
         });
         populateList();
+
+        getListView().setOnCreateContextMenuListener(
+                new OnCreateContextMenuListener() {
+            @Override
+            public void onCreateContextMenu(ContextMenu menu, View v, 
+                    ContextMenuInfo menuInfo) {
+                /*
+                MenuInflater inflater = getMenuInflater();
+                inflater.inflate(R.layout.contact_list_contextmenu, menu);
+                */
+                menu.setHeaderTitle("Actions:");
+                menu.add(0, MSG_CONTACT_ITEM, 0, "Message Contact");
+                menu.add(0, EDIT_CONTACT_ITEM, 0, "Edit Contact");
+                menu.add(0, DELETE_CONTACT_ITEM, 0, "Delete Contact");
+            }
+        });
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case MSG_CONTACT_ITEM:
+                break;
+            case EDIT_CONTACT_ITEM:
+                Intent intent = new Intent();
+                intent.setClassName("com.marvinmessaging", 
+                        "com.marvinmessaging.NewContact");
+                intent.setAction(Intent.ACTION_EDIT);
+                startActivity(intent);
+                break;
+            case DELETE_CONTACT_ITEM:
+                break;
+            default:
+                return super.onContextItemSelected(item);
+        }
+        return true; //return true if we are doing any of our actions
     }
 
     private void populateList() {
