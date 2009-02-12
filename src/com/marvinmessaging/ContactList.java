@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.app.ListActivity;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,6 +20,8 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnCreateContextMenuListener;
+import android.content.DialogInterface;
+import android.content.DialogInterface;
 
 public class ContactList extends ListActivity {
     private MarvinDbAdapter mDbAdapter;
@@ -63,8 +66,33 @@ public class ContactList extends ListActivity {
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        menu.add(0, 0, 0, "Add New Contact");
+        menu.add(0, 1, 1, "Settings");
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
+            case 0:
+                Intent intent = new Intent();
+                intent.setClassName("com.marvinmessaging", "com.marvinmessaging.NewContact");
+                startActivity(intent);
+                return true;
+            case 1:
+                //do something
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+        switch(id) {
             case MSG_CONTACT_ITEM:
                 break;
             case EDIT_CONTACT_ITEM:
@@ -75,6 +103,20 @@ public class ContactList extends ListActivity {
                 startActivity(intent);
                 break;
             case DELETE_CONTACT_ITEM:
+                new AlertDialog.Builder(this)
+                    .setTitle("Are you sure?")
+                    .setMessage("This will delete the contact permanently, there is no going back!")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog) {
+                            mDbAdapter.deleteContact(id);
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnCancelListener() {
+                        public void onCancel(DialogInterface dialog) {
+                            //don't do anything right now...
+                        }
+                    })
+                    .show();
                 break;
             default:
                 return super.onContextItemSelected(item);
