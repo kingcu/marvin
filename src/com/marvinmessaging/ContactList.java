@@ -91,7 +91,9 @@ public class ContactList extends ListActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        final int id = item.getItemId();
+        int id = item.getItemId();
+		final AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo)item.getMenuInfo();
+
         switch(id) {
             case MSG_CONTACT_ITEM:
                 break;
@@ -107,15 +109,12 @@ public class ContactList extends ListActivity {
                     .setTitle("Are you sure?")
                     .setMessage("This will delete the contact permanently, there is no going back!")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog) {
-                            mDbAdapter.deleteContact(id);
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            mDbAdapter.deleteContact(getListAdapter().getItemId(menuInfo.position));
+							populateList();
                         }
                     })
-                    .setNegativeButton("Cancel", new DialogInterface.OnCancelListener() {
-                        public void onCancel(DialogInterface dialog) {
-                            //don't do anything right now...
-                        }
-                    })
+                    .setNegativeButton("Cancel", null)
                     .show();
                 break;
             default:

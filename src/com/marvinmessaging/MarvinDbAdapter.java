@@ -141,6 +141,13 @@ public class MarvinDbAdapter {
         return mDb.update(CONTACTS_TABLE, values, KEY_ID + "=" + id, null) > 0;
     }
 
+	/**
+	 * delete a given contact
+	 *
+	 * @param id the id of contact to delete
+	 *
+	 * @returns true if contact was deleted, false otherwise
+	 */
     public boolean deleteContact(long id) {
         return mDb.delete(CONTACTS_TABLE, KEY_ID + "=" + id, null) > 0;
     }

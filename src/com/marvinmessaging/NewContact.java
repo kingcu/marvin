@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.content.Intent;
 import android.database.Cursor;
 import com.marvinmessaging.MarvinDbAdapter;
-import com.marvinmessaging.Contact;
 
 public class NewContact extends Activity {
     private static final int CREATE_STATE = 0;
