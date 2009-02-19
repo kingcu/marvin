@@ -93,15 +93,24 @@ public class ContactList extends ListActivity {
     public boolean onContextItemSelected(MenuItem item) {
         int id = item.getItemId();
 		final AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo)item.getMenuInfo();
+		final long rowId = getListAdapter().getItemId(menuInfo.position);
+		Intent intent;
 
         switch(id) {
             case MSG_CONTACT_ITEM:
+				intent = new Intent();
+				intent.setClassName("com.marvinmessaging",
+						"com.marvinmessaging.NewMessage");
+				intent.setAction(Intent.ACTION_VIEW);
+				intent.putExtra(MarvinDbAdapter.KEY_ID, rowId);
+				startActivity(intent);
                 break;
             case EDIT_CONTACT_ITEM:
-                Intent intent = new Intent();
+                intent = new Intent();
                 intent.setClassName("com.marvinmessaging", 
                         "com.marvinmessaging.NewContact");
                 intent.setAction(Intent.ACTION_EDIT);
+				intent.putExtra(MarvinDbAdapter.KEY_ID, rowId);
                 startActivity(intent);
                 break;
             case DELETE_CONTACT_ITEM:
@@ -110,7 +119,7 @@ public class ContactList extends ListActivity {
                     .setMessage("This will delete the contact permanently, there is no going back!")
                     .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            mDbAdapter.deleteContact(getListAdapter().getItemId(menuInfo.position));
+                            mDbAdapter.deleteContact(rowId);
 							populateList();
                         }
                     })

@@ -17,7 +17,12 @@ public final class R {
         public static final int contact_l_name=0x7f040007;
         public static final int contact_m_num=0x7f040008;
         public static final int contact_submit_button=0x7f040009;
+        public static final int message_form_title=0x7f04000a;
         public static final int new_contact=0x7f040000;
+        public static final int new_message_body=0x7f04000d;
+        public static final int new_message_name=0x7f04000b;
+        public static final int new_message_num=0x7f04000c;
+        public static final int new_message_submit_button=0x7f04000e;
         public static final int row_name=0x7f040001;
         public static final int row_phone_number=0x7f040002;
         public static final int view_contacts=0x7f040004;
@@ -28,14 +33,17 @@ public final class R {
         public static final int contact_row=0x7f020002;
         public static final int main=0x7f020003;
         public static final int new_contact=0x7f020004;
+        public static final int new_message=0x7f020005;
     }
     public static final class string {
         public static final int app_name=0x7f030000;
-        public static final int contact_form_button=0x7f030006;
+        public static final int contact_form_button=0x7f030007;
         public static final int contact_form_button_edit=0x7f030002;
         public static final int contact_form_button_insert=0x7f030001;
-        public static final int contact_form_title=0x7f030005;
+        public static final int contact_form_title=0x7f030006;
         public static final int contact_form_title_edit=0x7f030004;
         public static final int contact_form_title_insert=0x7f030003;
+        public static final int message_form_title=0x7f030005;
+        public static final int new_message_form_button=0x7f030008;
     }
 }

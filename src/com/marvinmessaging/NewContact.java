@@ -41,6 +41,11 @@ public class NewContact extends Activity {
         mId = (savedInstanceState != null) ? 
             savedInstanceState.getLong(MarvinDbAdapter.KEY_ID) : null;
 
+		if(mId == null) {
+			Bundle extras = getIntent().getExtras();
+			mId = extras != null ? extras.getLong(MarvinDbAdapter.KEY_ID) : null;
+		}
+
         if(Intent.ACTION_EDIT.equals(action)) {
             mState = EDIT_STATE;
         } else if(Intent.ACTION_INSERT.equals(action)) {
@@ -70,13 +75,8 @@ public class NewContact extends Activity {
             mTitleText.setText(getText(R.string.contact_form_title_insert));
             mSubmitButton.setText(getText(R.string.contact_form_button_insert));
             setTitle(getText(R.string.contact_form_title_insert));
-
-            /*
-            Bundle extras = getIntent().getExtras();
-            mId = (extras != null) ? 
-                extras.getLong(MarvinDbAdapter.KEY_ID) : null;
-            */
         }
+		populateForm();
     }
 
     @Override
@@ -103,10 +103,12 @@ public class NewContact extends Activity {
         String num = mMobileNum.getText().toString();
 
         if(mId == null) { //new entry, create a new contact
-            long id = mDbAdapter.createContact(fname, lname, num);
-            if(id>0) {
-                mId = id;
-            }
+			if(fname.length() > 0 && lname.length() > 0 && num.length() > 0) {
+				long id = mDbAdapter.createContact(fname, lname, num);
+				if(id>0) {
+					mId = id;
+				}
+			}
         } else { //we are updating an existing contact
             mDbAdapter.updateContact(mId, fname, lname, num);
         }
