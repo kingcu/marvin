@@ -14,6 +14,7 @@ public class MarvinDbAdapter {
     public static final String KEY_LAST_NAME = "last_name";
     public static final String KEY_MOB_NUM = "mobile_num";
     public static final String KEY_PUB_KEY = "pub_key";
+	public static final String KEY_IS_AUTH = "is_auth";
     public static final String KEY_CONVO_TIMEOUT = "convo_timeout";
     public static final String KEY_MSGS_PER_KEY = "msgs_per_key";
 
@@ -26,6 +27,7 @@ public class MarvinDbAdapter {
         KEY_LAST_NAME      + " text not null, " +
         KEY_MOB_NUM        + " text not null, " +
         KEY_PUB_KEY        + " text, " + 
+		KEY_IS_AUTH		   + " boolean not null default 0, " +
         KEY_CONVO_TIMEOUT  + " long not null default 1440, " +
         KEY_MSGS_PER_KEY   + " int not null default 10);";
 
@@ -132,11 +134,12 @@ public class MarvinDbAdapter {
      *
      * @return true if updated, false if failed
      */
-    public boolean updateContact(long id, String fName, String lName, String num) {
+    public boolean updateContact(long id, String fName, String lName, String num, boolean auth) {
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_NAME, fName);
         values.put(KEY_LAST_NAME, lName);
         values.put(KEY_MOB_NUM, num);
+		values.put(KEY_IS_AUTH, auth);
 
         return mDb.update(CONTACTS_TABLE, values, KEY_ID + "=" + id, null) > 0;
     }
@@ -151,4 +154,22 @@ public class MarvinDbAdapter {
     public boolean deleteContact(long id) {
         return mDb.delete(CONTACTS_TABLE, KEY_ID + "=" + id, null) > 0;
     }
+
+	public String getFormattedPhone(long id) {
+		String num;
+		String formattedNum;
+        Cursor cursor = mDb.query(true, CONTACTS_TABLE, new String[] {KEY_ID,
+            KEY_MOB_NUM}, KEY_ID + "=" + id, null, null, null, null, null);
+        if(cursor != null) {
+            cursor.moveToFirst();
+        }
+		num = cursor.getString(cursor.getColumnIndex(KEY_MOB_NUM));
+		
+		if(num.length() == 10) {
+			formattedNum = "(" + num.substring(0, 3) + ")" + num.substring(3,6) + "-" + num.substring(6);
+		} else {
+			formattedNum = num;
+		}
+		return formattedNum;
+	}
 }

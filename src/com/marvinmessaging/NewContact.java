@@ -110,7 +110,7 @@ public class NewContact extends Activity {
 				}
 			}
         } else { //we are updating an existing contact
-            mDbAdapter.updateContact(mId, fname, lname, num);
+            mDbAdapter.updateContact(mId, fname, lname, num, false);
         }
     }
 

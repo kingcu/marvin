@@ -32,6 +32,7 @@
 		<EditText android:id="@+id/contact_f_name"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
+			android:singleLine="true"
 			android:layout_weight="1" />
 
 		<TextView
@@ -44,6 +45,7 @@
 		<EditText android:id="@+id/contact_l_name"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
+			android:singleLine="true"
 			android:layout_weight="1" />
 		
 		<TextView
@@ -56,6 +58,7 @@
 		<EditText android:id="@+id/contact_m_num"
 			android:layout_width="fill_parent"
 			android:layout_height="fill_parent"
+			android:singleLine="true"
 			android:layout_weight="1" />
 
 		<Button android:id="@+id/contact_submit_button"

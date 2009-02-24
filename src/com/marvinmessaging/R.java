@@ -17,11 +17,11 @@ public final class R {
         public static final int contact_l_name=0x7f040007;
         public static final int contact_m_num=0x7f040008;
         public static final int contact_submit_button=0x7f040009;
-        public static final int message_form_title=0x7f04000a;
         public static final int new_contact=0x7f040000;
+        public static final int new_message_authenticated=0x7f04000c;
         public static final int new_message_body=0x7f04000d;
-        public static final int new_message_name=0x7f04000b;
-        public static final int new_message_num=0x7f04000c;
+        public static final int new_message_name=0x7f04000a;
+        public static final int new_message_num=0x7f04000b;
         public static final int new_message_submit_button=0x7f04000e;
         public static final int row_name=0x7f040001;
         public static final int row_phone_number=0x7f040002;
@@ -44,6 +44,5 @@ public final class R {
         public static final int contact_form_title_edit=0x7f030004;
         public static final int contact_form_title_insert=0x7f030003;
         public static final int message_form_title=0x7f030005;
-        public static final int new_message_form_button=0x7f030008;
     }
 }

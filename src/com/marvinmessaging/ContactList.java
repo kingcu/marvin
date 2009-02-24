@@ -10,6 +10,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.view.View;
 import android.view.MenuInflater;
@@ -29,6 +31,7 @@ public class ContactList extends ListActivity {
     protected static final int MSG_CONTACT_ITEM = Menu.FIRST;
     protected static final int EDIT_CONTACT_ITEM = Menu.FIRST + 1;
     protected static final int DELETE_CONTACT_ITEM = Menu.FIRST + 2;
+    protected static final int CANCEL_CONTACT_ITEM = Menu.FIRST + 3;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +51,16 @@ public class ContactList extends ListActivity {
         });
         populateList();
 
+		getListView().setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
+				Intent intent = new Intent();
+				intent.setClassName("com.marvinmessaging", "com.marvinmessaging.NewMessage");
+				intent.putExtra(MarvinDbAdapter.KEY_ID, id);
+				startActivity(intent);
+			}
+		});
+
         getListView().setOnCreateContextMenuListener(
                 new OnCreateContextMenuListener() {
             @Override
@@ -61,6 +74,7 @@ public class ContactList extends ListActivity {
                 menu.add(0, MSG_CONTACT_ITEM, 0, "Message Contact");
                 menu.add(0, EDIT_CONTACT_ITEM, 0, "Edit Contact");
                 menu.add(0, DELETE_CONTACT_ITEM, 0, "Delete Contact");
+				menu.add(0, CANCEL_CONTACT_ITEM, 0, "Cancel");
             }
         });
     }
@@ -126,6 +140,8 @@ public class ContactList extends ListActivity {
                     .setNegativeButton("Cancel", null)
                     .show();
                 break;
+			case CANCEL_CONTACT_ITEM:
+				break;
             default:
                 return super.onContextItemSelected(item);
         }

@@ -15,6 +15,7 @@ public class NewMessage extends Activity {
 	private EditText mMsgBody;
 	private TextView mName;
 	private TextView mNum;
+	private TextView mAuthenticated;
 	private Button mSubmitButton;
 	private MarvinDbAdapter mDbAdapter;
 	private Long mId;
@@ -48,6 +49,7 @@ public class NewMessage extends Activity {
 		mMsgBody = (EditText)findViewById(R.id.new_message_body);
 		mName = (TextView)findViewById(R.id.new_message_name);
 		mNum = (TextView)findViewById(R.id.new_message_num);
+		mAuthenticated = (TextView)findViewById(R.id.new_message_authenticated);
 
 		populateForm();
 
@@ -102,7 +104,8 @@ public class NewMessage extends Activity {
 			String num = contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM));
 			
 			mName.setText(fname + " " + lname);
-			mNum.setText(num);
+			mNum.setText(mDbAdapter.getFormattedPhone(mId));
+			mAuthenticated.setText("Authenticated :)");
 		}
 	}
 }
