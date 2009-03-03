@@ -22,6 +22,7 @@ public class NewContact extends Activity {
     private Button mSubmitButton;
     private Long mId;
     private int mState;
+	private Bundle mBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +30,7 @@ public class NewContact extends Activity {
         final Intent intent = getIntent();
         final String action = intent.getAction();
 
+		mBundle = savedInstanceState;
         mDbAdapter = new MarvinDbAdapter(this);
         mDbAdapter.open();
         setContentView(R.layout.new_contact);
@@ -57,6 +59,7 @@ public class NewContact extends Activity {
             public void onClick(View v) {
                 //tell the activity the result returned to the caller
                 setResult(RESULT_OK);
+				saveState();
                 finish(); //we are done, so onPause will be called;
             }
         });
@@ -70,25 +73,37 @@ public class NewContact extends Activity {
             mTitleText.setText(getText(R.string.contact_form_title_edit));
             mSubmitButton.setText(getText(R.string.contact_form_button_edit));
             setTitle(getText(R.string.contact_form_title_edit));
-            populateForm();
+			if(mBundle != null) {
+				mFirstName.setText(mBundle.getString(MarvinDbAdapter.KEY_FIRST_NAME));
+				mLastName.setText(mBundle.getString(MarvinDbAdapter.KEY_LAST_NAME));
+				mMobileNum.setText(mBundle.getString(MarvinDbAdapter.KEY_MOB_NUM));
+			} else {
+				populateForm();
+			}
         } else { //entering new contact
             mTitleText.setText(getText(R.string.contact_form_title_insert));
             mSubmitButton.setText(getText(R.string.contact_form_button_insert));
             setTitle(getText(R.string.contact_form_title_insert));
         }
-		populateForm();
+		//populateForm();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+		String fname = mFirstName.getText().toString();
+		String lname = mLastName.getText().toString();
+		String num = mMobileNum.getText().toString();
         outState.putLong(MarvinDbAdapter.KEY_ID, mId);
+		outState.putString(MarvinDbAdapter.KEY_FIRST_NAME, fname);
+		outState.putString(MarvinDbAdapter.KEY_LAST_NAME, lname);
+		outState.putString(MarvinDbAdapter.KEY_MOB_NUM, num);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        saveState();
+        //saveState();
     }
 
     @Override
@@ -103,11 +118,9 @@ public class NewContact extends Activity {
         String num = mMobileNum.getText().toString();
 
         if(mId == null) { //new entry, create a new contact
-			if(fname.length() > 0 && lname.length() > 0 && num.length() > 0) {
-				long id = mDbAdapter.createContact(fname, lname, num);
-				if(id>0) {
-					mId = id;
-				}
+			long id = mDbAdapter.createContact(fname, lname, num);
+			if(id>0) {
+				mId = id;
 			}
         } else { //we are updating an existing contact
             mDbAdapter.updateContact(mId, fname, lname, num, false);

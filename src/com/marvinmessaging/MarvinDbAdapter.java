@@ -23,8 +23,8 @@ public class MarvinDbAdapter {
     private static final int DB_VERSION = 1; //TODO: is this needed?
     private static final String CREATE_CONTACTS_TABLE = "create table " + 
         CONTACTS_TABLE + " (_id integer primary key autoincrement, " +
-        KEY_FIRST_NAME     + " text not null, " +
-        KEY_LAST_NAME      + " text not null, " +
+        KEY_FIRST_NAME     + " text, " +
+        KEY_LAST_NAME      + " text, " +
         KEY_MOB_NUM        + " text not null, " +
         KEY_PUB_KEY        + " text, " + 
 		KEY_IS_AUTH		   + " boolean not null default 0, " +
@@ -87,7 +87,7 @@ public class MarvinDbAdapter {
     public Cursor getContacts() {
         return mDb.query(CONTACTS_TABLE, 
                 new String[] {KEY_ID, KEY_LAST_NAME, KEY_FIRST_NAME, KEY_MOB_NUM}, 
-                null, null, null, null, null);
+                null, null, null, null, KEY_LAST_NAME + " ASC", null);
     }
 
     /**
