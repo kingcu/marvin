@@ -167,9 +167,13 @@ public class MarvinDbAdapter {
 		
 		if(num.length() == 10) {
 			formattedNum = "(" + num.substring(0, 3) + ")" + num.substring(3,6) + "-" + num.substring(6);
-		} else {
-			formattedNum = num;
-		}
+		} else if(num.length() == 11 && num.charAt(0) == '1') {
+			formattedNum = num.charAt(0) + "(" + num.substring(1, 4) + ")" + num.substring(4,7) + "-" + num.substring(7);
+		} else if(num.length() == 7) {
+            formattedNum = num.substring(0, 3) + "-" + num.substring(3);
+        } else {
+            formattedNum = num;
+        }
 		return formattedNum;
 	}
 }

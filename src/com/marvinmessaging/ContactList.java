@@ -41,14 +41,6 @@ public class ContactList extends ListActivity {
         mDbAdapter = new MarvinDbAdapter(this);
         mDbAdapter.open();
 
-        TextView newContact = (TextView)findViewById(R.id.new_contact);
-        newContact.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent();
-                intent.setClassName("com.marvinmessaging", "com.marvinmessaging.NewContact");
-                startActivity(intent);
-            }
-        });
         populateList();
 
 		getListView().setOnItemClickListener(new OnItemClickListener() {
@@ -90,14 +82,17 @@ public class ContactList extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch(item.getItemId()) {
             case 0:
-                Intent intent = new Intent();
+                intent = new Intent();
                 intent.setClassName("com.marvinmessaging", "com.marvinmessaging.NewContact");
                 startActivity(intent);
                 return true;
             case 1:
-                //do something
+                intent = new Intent();
+                intent.setClassName("com.marvinmessaging", "com.marvinmessaging.ApplicationSettings");
+                startActivity(intent);
                 return true;
         }
         return false;
@@ -182,8 +177,8 @@ public class ContactList extends ListActivity {
             String fName = cursor.getString(cursor.getColumnIndex(MarvinDbAdapter.KEY_FIRST_NAME));
             String num = cursor.getString(cursor.getColumnIndex(MarvinDbAdapter.KEY_MOB_NUM));
 
-            nameView.setText(lName + ", " + fName);
-            numView.setText(num);
+            nameView.setText(fName + " " + lName);
+            numView.setText(mDbAdapter.getFormattedPhone(cursor.getInt(cursor.getColumnIndex(MarvinDbAdapter.KEY_ID))));
         }
     }
 }

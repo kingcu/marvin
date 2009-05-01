@@ -12,7 +12,7 @@ import android.database.Cursor;
 import com.marvinmessaging.MarvinDbAdapter;
 
 public class NewMessage extends Activity {
-	private EditText mMsgBody;
+	private TextView mMsgBody;
 	private TextView mName;
 	private TextView mNum;
 	private TextView mAuthenticated;
@@ -46,12 +46,10 @@ public class NewMessage extends Activity {
 
 		setContentView(R.layout.new_message);
 
-		mMsgBody = (EditText)findViewById(R.id.new_message_body);
+		mMsgBody = (TextView)findViewById(R.id.new_message_body);
 		mName = (TextView)findViewById(R.id.new_message_name);
 		mNum = (TextView)findViewById(R.id.new_message_num);
 		mAuthenticated = (TextView)findViewById(R.id.new_message_authenticated);
-
-		populateForm();
 
 		mSubmitButton = (Button)findViewById(R.id.new_message_submit_button);
 		mSubmitButton.setOnClickListener(new OnClickListener() {
@@ -61,6 +59,8 @@ public class NewMessage extends Activity {
 				finish();
 			}
 		});
+
+		populateForm();
 	}
 
 	//TODO: implement decryption stuff here (for saved instance states)

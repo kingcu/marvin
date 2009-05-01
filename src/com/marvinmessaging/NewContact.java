@@ -18,7 +18,6 @@ public class NewContact extends Activity {
     private EditText mFirstName;
     private EditText mLastName;
     private EditText mMobileNum;
-    private TextView mTitleText;
     private Button mSubmitButton;
     private Long mId;
     private int mState;
@@ -38,8 +37,7 @@ public class NewContact extends Activity {
         mFirstName = (EditText)findViewById(R.id.contact_f_name);
         mLastName = (EditText)findViewById(R.id.contact_l_name);
         mMobileNum = (EditText)findViewById(R.id.contact_m_num);
-        mTitleText = (TextView)findViewById(R.id.contact_form_title);
-
+        mSubmitButton = (Button)findViewById(R.id.contact_submit_button);
         mId = (savedInstanceState != null) ? 
             savedInstanceState.getLong(MarvinDbAdapter.KEY_ID) : null;
 
@@ -53,16 +51,6 @@ public class NewContact extends Activity {
         } else if(Intent.ACTION_INSERT.equals(action)) {
             mState = CREATE_STATE;
         }
-
-        mSubmitButton = (Button)findViewById(R.id.contact_submit_button);
-        mSubmitButton.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                //tell the activity the result returned to the caller
-                setResult(RESULT_OK);
-				saveState();
-                finish(); //we are done, so onPause will be called;
-            }
-        });
     }
 
     @Override
@@ -70,7 +58,6 @@ public class NewContact extends Activity {
         super.onResume();
 
         if(mState == EDIT_STATE) { //we are editing a contact
-            mTitleText.setText(getText(R.string.contact_form_title_edit));
             mSubmitButton.setText(getText(R.string.contact_form_button_edit));
             setTitle(getText(R.string.contact_form_title_edit));
 			if(mBundle != null) {
@@ -81,11 +68,18 @@ public class NewContact extends Activity {
 				populateForm();
 			}
         } else { //entering new contact
-            mTitleText.setText(getText(R.string.contact_form_title_insert));
             mSubmitButton.setText(getText(R.string.contact_form_button_insert));
             setTitle(getText(R.string.contact_form_title_insert));
         }
-		//populateForm();
+
+        mSubmitButton.setOnClickListener(new OnClickListener() {
+            public void onClick(View v) {
+                //tell the activity the result returned to the caller
+                setResult(RESULT_OK);
+				saveState();
+                finish(); //we are done, so onPause will be called;
+            }
+        });
     }
 
     @Override
