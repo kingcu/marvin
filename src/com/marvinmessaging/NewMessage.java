@@ -119,8 +119,7 @@ public class NewMessage extends Activity {
                     contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME)));
 			CharSequence lname = CryptoHelper.decryptText(
                     contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME)));
-			CharSequence num = CryptoHelper.decryptText(
-                    contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM)));
+			String num = contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM));
             CharSequence secret = CryptoHelper.decryptText(
                 contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_PUB_KEY)));
 

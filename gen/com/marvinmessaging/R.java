@@ -26,12 +26,12 @@ public final class R {
         public static final int new_message_name=0x7f05000a;
         public static final int new_message_num=0x7f05000b;
         public static final int new_message_submit_button=0x7f05000e;
-        public static final int nview_message_body=0x7f050013;
         public static final int row_name=0x7f050003;
         public static final int row_phone_number=0x7f050004;
         public static final int settings_master_password=0x7f050000;
         public static final int settings_master_password_conf=0x7f050001;
         public static final int settings_save_button=0x7f050002;
+        public static final int view_message_body=0x7f050013;
         public static final int view_message_name=0x7f050011;
         public static final int view_message_num=0x7f050012;
         public static final int view_message_reply_button=0x7f050014;

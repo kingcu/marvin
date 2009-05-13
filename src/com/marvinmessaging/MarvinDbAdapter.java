@@ -201,7 +201,7 @@ public class MarvinDbAdapter {
         }
 
         //TODO: again, move away from strings, this is geto and insecure.
-		num = (String)CryptoHelper.decryptText(cursor.getString(cursor.getColumnIndex(KEY_MOB_NUM)));
+		num = cursor.getString(cursor.getColumnIndex(KEY_MOB_NUM));
         cursor.close();
 		
 		if(num.length() == 10) {

@@ -32,9 +32,9 @@
             android:textSize="14sp"
             android:text="" />
         <TextView
-            android:id="@+id/nview_message_body"
+            android:id="@+id/view_message_body"
             android:layout_width="fill_parent"
-            android:layout_height="150dip"
+            android:layout_height="wrap_content"
             android:padding="10sp"
             android:gravity="top"
             android:textSize="14sp" />

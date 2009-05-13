@@ -150,6 +150,8 @@ public class ApplicationSettings extends Activity {
                         CryptoHelper.encryptText((CharSequence)tempContacts[i].get("lname")),
                         CryptoHelper.encryptText((CharSequence)tempContacts[i].get("num")));
             }
+            mApp.unlockPassword = pass;
+            mApp.lastActivity = (new Date()).getTime();
         }
         return true;
     }

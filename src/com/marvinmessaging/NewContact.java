@@ -119,12 +119,11 @@ public class NewContact extends Activity {
     private void saveState() {
         char[] cfname = CryptoHelper.fromCharSeqToChars(mFirstName.getText());
         char[] clname = CryptoHelper.fromCharSeqToChars(mLastName.getText());
-        char[] cnum = CryptoHelper.fromCharSeqToChars(mMobileNum.getText());
         char[] ckey = CryptoHelper.fromCharSeqToChars(mKey.getText());
         String fname = CryptoHelper.encryptText(cfname);
         String lname = CryptoHelper.encryptText(clname);
-        String num = CryptoHelper.encryptText(cnum);
         String key = CryptoHelper.encryptText(ckey);
+        String num = mMobileNum.getText().toString();
 
         Log.i("marvin", fname);
         if(mId == null) { //new entry, create a new contact
@@ -145,8 +144,7 @@ public class NewContact extends Activity {
                         contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME))));
             mLastName.setText(CryptoHelper.decryptText(
                         contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME))));
-            mMobileNum.setText(CryptoHelper.decryptText(
-                        contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM))));
+            mMobileNum.setText(contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM)));
 
             contact.close();
         }
