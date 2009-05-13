@@ -1,5 +1,7 @@
 package com.marvinmessaging;
 
+import java.util.Date;
+import android.util.Log;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
@@ -18,10 +20,12 @@ public class NewContact extends Activity {
     private EditText mFirstName;
     private EditText mLastName;
     private EditText mMobileNum;
+    private EditText mKey;
     private Button mSubmitButton;
     private Long mId;
     private int mState;
 	private Bundle mBundle;
+    private MarvinApplication mApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +33,7 @@ public class NewContact extends Activity {
         final Intent intent = getIntent();
         final String action = intent.getAction();
 
+        mApp = (MarvinApplication)getApplication();
 		mBundle = savedInstanceState;
         mDbAdapter = new MarvinDbAdapter(this);
         mDbAdapter.open();
@@ -37,6 +42,7 @@ public class NewContact extends Activity {
         mFirstName = (EditText)findViewById(R.id.contact_f_name);
         mLastName = (EditText)findViewById(R.id.contact_l_name);
         mMobileNum = (EditText)findViewById(R.id.contact_m_num);
+        mKey = (EditText)findViewById(R.id.contact_key);
         mSubmitButton = (Button)findViewById(R.id.contact_submit_button);
         mId = (savedInstanceState != null) ? 
             savedInstanceState.getLong(MarvinDbAdapter.KEY_ID) : null;
@@ -57,13 +63,17 @@ public class NewContact extends Activity {
     protected void onResume() {
         super.onResume();
 
+        long now = (new Date()).getTime();
+        if(mApp.unlockPassword == null || (now - mApp.lastActivity) > 60000)
+            mApp.requestPassword(this);
+
         if(mState == EDIT_STATE) { //we are editing a contact
             mSubmitButton.setText(getText(R.string.contact_form_button_edit));
             setTitle(getText(R.string.contact_form_title_edit));
 			if(mBundle != null) {
-				mFirstName.setText(mBundle.getString(MarvinDbAdapter.KEY_FIRST_NAME));
-				mLastName.setText(mBundle.getString(MarvinDbAdapter.KEY_LAST_NAME));
-				mMobileNum.setText(mBundle.getString(MarvinDbAdapter.KEY_MOB_NUM));
+				mFirstName.setText(mBundle.getCharSequence(MarvinDbAdapter.KEY_FIRST_NAME));
+				mLastName.setText(mBundle.getCharSequence(MarvinDbAdapter.KEY_LAST_NAME));
+				mMobileNum.setText(mBundle.getCharSequence(MarvinDbAdapter.KEY_MOB_NUM));
 			} else {
 				populateForm();
 			}
@@ -80,24 +90,24 @@ public class NewContact extends Activity {
                 finish(); //we are done, so onPause will be called;
             }
         });
+        mApp.lastActivity = (new Date()).getTime();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-		String fname = mFirstName.getText().toString();
+		CharSequence fname = mFirstName.getText().toString();
 		String lname = mLastName.getText().toString();
 		String num = mMobileNum.getText().toString();
         outState.putLong(MarvinDbAdapter.KEY_ID, mId);
-		outState.putString(MarvinDbAdapter.KEY_FIRST_NAME, fname);
-		outState.putString(MarvinDbAdapter.KEY_LAST_NAME, lname);
-		outState.putString(MarvinDbAdapter.KEY_MOB_NUM, num);
+		outState.putCharSequence(MarvinDbAdapter.KEY_FIRST_NAME, mFirstName.getText());
+		outState.putCharSequence(MarvinDbAdapter.KEY_LAST_NAME, mLastName.getText());
+		outState.putCharSequence(MarvinDbAdapter.KEY_MOB_NUM, mMobileNum.getText());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //saveState();
     }
 
     @Override
@@ -107,27 +117,38 @@ public class NewContact extends Activity {
     }
 
     private void saveState() {
-        String fname = mFirstName.getText().toString();
-        String lname = mLastName.getText().toString();
-        String num = mMobileNum.getText().toString();
+        char[] cfname = CryptoHelper.fromCharSeqToChars(mFirstName.getText());
+        char[] clname = CryptoHelper.fromCharSeqToChars(mLastName.getText());
+        char[] cnum = CryptoHelper.fromCharSeqToChars(mMobileNum.getText());
+        char[] ckey = CryptoHelper.fromCharSeqToChars(mKey.getText());
+        String fname = CryptoHelper.encryptText(cfname);
+        String lname = CryptoHelper.encryptText(clname);
+        String num = CryptoHelper.encryptText(cnum);
+        String key = CryptoHelper.encryptText(ckey);
 
+        Log.i("marvin", fname);
         if(mId == null) { //new entry, create a new contact
-			long id = mDbAdapter.createContact(fname, lname, num);
+			long id = mDbAdapter.createContact(fname, lname, num, key);
 			if(id>0) {
 				mId = id;
 			}
         } else { //we are updating an existing contact
-            mDbAdapter.updateContact(mId, fname, lname, num, false);
+            mDbAdapter.updateContact(mId, fname, lname, num, key);
         }
     }
 
     private void populateForm() {
         if(mId != null) {
             Cursor contact = mDbAdapter.getContact(mId);
-            startManagingCursor(contact);
-            mFirstName.setText(contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME)));
-            mLastName.setText(contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME)));
-            mMobileNum.setText(contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM)));
+
+            mFirstName.setText(CryptoHelper.decryptText(
+                        contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME))));
+            mLastName.setText(CryptoHelper.decryptText(
+                        contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME))));
+            mMobileNum.setText(CryptoHelper.decryptText(
+                        contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM))));
+
+            contact.close();
         }
     }
 }

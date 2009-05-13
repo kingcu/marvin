@@ -27,6 +27,17 @@ public class CryptoHelper {
     //TODO: come up with less arbitrary number
     private static final int ITERATION_COUNT = 50;
 
+    //TODO: totally pointless and insecure, but gotta get this going
+    private static final byte[] messageSalt = {
+        (byte)0xfc, (byte)0x76, (byte)0x80, (byte)0xae,
+        (byte)0xfd, (byte)0x82, (byte)0xbe, (byte)0xee,
+    };
+
+    public static Cipher storageEncryptionCipher;
+    public static Cipher storageDecryptionCipher;
+    public static Cipher messageEncryptionCipher;
+    public static Cipher messageDecryptionCipher;
+
     public static byte[] generateSalt() {
         byte[] salt = new byte[8];
         SecureRandom random = new SecureRandom();
@@ -114,22 +125,105 @@ public class CryptoHelper {
             ret[i] = seq.charAt(i);
         }   
         return ret;
-    }   
+    }
 
-    /*
-       private Cipher createCipher(String pass, byte[] salt, String factory, int mode)
-       throws NoSuchAlgorithmException,
-                  InvalidKeySpecException,
-                  NoSuchPaddingException,
-                  InvalidKeyException,
-                  InvalidAlgorithmParameterException {
+    public static byte[] charArrayToByteArray(char[] in) {
+        byte[] ret = new byte[in.length];
+        int i;
+        for(i = 0; i < in.length; i++) {
+            ret[i] = (byte)(in[i] & 0xFF);
+        }
+        return ret;
+    }
 
-//make the keyspec with passed in values, and a 128bit key
-SecretKey key = createKey(pass, salt);
-AlgorithmParameterSpec algoSpec = new PBEParameterSpec(salt, ITERATION_COUNT);
-Cipher cipher = Cipher.getInstance(factory);
-        cipher.init(mode, key, algoSpec);
+    public static char[] byteArrayToCharArray(byte[] in) {
+        char[] ret = new char[in.length];
+        int i;
+        for(i = 0; i < in.length; i++) {
+            ret[i] = (char)(in[i] & 0xFF);
+        }
+        return ret;
+    }
+
+    public static void genStorageCiphers(char[] pass, byte[] salt) {
+        try {
+            storageEncryptionCipher = genCipher(pass, salt, KEY_FACTORY, ITERATION_COUNT, Cipher.ENCRYPT_MODE);
+            storageDecryptionCipher = genCipher(pass, salt, KEY_FACTORY, ITERATION_COUNT, Cipher.DECRYPT_MODE);
+        } catch (Exception e) {
+            Log.d(LOG_TAG, "genStorageCiphers", e);
+        }
+    }
+
+    public static void genMessageCiphers(char[] pass) {
+        try {
+            messageEncryptionCipher = genCipher(pass, messageSalt, KEY_FACTORY, ITERATION_COUNT, Cipher.ENCRYPT_MODE);
+            messageDecryptionCipher = genCipher(pass, messageSalt, KEY_FACTORY, ITERATION_COUNT, Cipher.DECRYPT_MODE);
+        } catch (Exception e) {
+            Log.d(LOG_TAG, "genStorageCiphers", e);
+        } 
+    }
+
+    private static Cipher genCipher(char[] pass, byte[] salt, String factory, int iterations, int mode)
+        throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,
+                          InvalidKeyException, InvalidAlgorithmParameterException {
+        PBEKeySpec keySpec = new PBEKeySpec(pass, salt, iterations, 128);
+        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance(factory);
+        SecretKey key = keyFactory.generateSecret(keySpec);
+        AlgorithmParameterSpec spec = new PBEParameterSpec(salt, iterations);
+        Cipher cipher = Cipher.getInstance(factory);
+        cipher.init(mode, key, spec);
         return cipher;
     }
-    */
+
+    public static String encryptMessageText(CharSequence plaintext) {
+        return encryptText(fromCharSeqToChars(plaintext), messageEncryptionCipher);
+    }
+
+    public static String encryptText(CharSequence plaintext) {
+        return encryptText(fromCharSeqToChars(plaintext), storageEncryptionCipher);
+    }
+
+    public static String encryptText(char[] plaintext) {
+        return encryptText(plaintext, storageEncryptionCipher);
+    }
+
+    private static String encryptText(char[] plaintext, Cipher cipher) {
+        byte[] plaintextBytes = charArrayToByteArray(plaintext);
+        byte[] ciphertext = {};
+
+        try {
+            ciphertext = cipher.doFinal(plaintextBytes);
+        } catch (Exception e) {
+            Log.d(LOG_TAG, "encryptText", e);
+        }
+
+        //turn into hex so storage as a string is possible (db)
+        return toHexString(ciphertext);
+    }
+
+    public static CharSequence decryptText(String ciphertextString) {
+        return decryptText(ciphertextString, storageDecryptionCipher);
+    }
+
+    public static CharSequence decryptMessageText(String ciphertext) {
+        return decryptText(ciphertext, messageDecryptionCipher);
+    }
+
+    private static CharSequence decryptText(String ciphertextString, Cipher cipher) {
+        byte[] ciphertext = hexStringToBytes(ciphertextString);
+        byte[] plaintext = {};
+
+        //can't decrypt an empty string...exceptions gallore
+        if(ciphertextString.length() == 0)
+            return (CharSequence)ciphertextString;
+
+        try {
+            plaintext = cipher.doFinal(ciphertext);
+        } catch(Exception e) {
+            Log.d(LOG_TAG, "decryptText", e);
+        }
+
+        //TODO: dont' convert to string as interim...insecure
+        return (CharSequence)(new String(plaintext));
+    }
 }

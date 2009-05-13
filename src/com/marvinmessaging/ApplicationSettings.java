@@ -1,6 +1,8 @@
 package com.marvinmessaging;
 
 import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Date;
 
 import android.util.Log;
 import android.os.Bundle;
@@ -35,15 +37,15 @@ public class ApplicationSettings extends Activity {
         super.onCreate(savedInstanceState);
         final Intent intent = getIntent();
         final String action = intent.getAction();
-        mApp = (MarvinApplication)getApplication();
 
         mSettings = getSharedPreferences(PREF_NAME, 0);
+        mApp = (MarvinApplication)getApplication();
+        if(mSettings.contains(KEY_PASS) && mApp.unlockPassword == null)
+            mApp.requestPassword(this);
+
         mBundle = savedInstanceState;
         mDbAdapter = new MarvinDbAdapter(this);
         mDbAdapter.open();
-
-        if(mApp.unlockPassword == null)
-            mApp.requestPassword(this);
 
         setContentView(R.layout.application_settings);
 
@@ -65,6 +67,11 @@ public class ApplicationSettings extends Activity {
     protected void onResume() {
         super.onResume();
 
+        long now = (new Date()).getTime();
+        if(mApp.unlockPassword == null || (now - mApp.lastActivity) > 60000)
+            mApp.requestPassword(this);
+        mApp.lastActivity = (new Date()).getTime();
+
         populateForm(); //TODO: maybe do inline
     }
 
@@ -85,30 +92,65 @@ public class ApplicationSettings extends Activity {
     }
 
     private boolean saveState() {
-        char[] pass = CryptoHelper.fromCharSeqToChars(mPass.getText());
-        char[] passConf = CryptoHelper.fromCharSeqToChars(mPassConf.getText());
+        if(mPass.getText().length() > 0) {
+            //OK, so we are changing the password....
+            char[] pass = CryptoHelper.fromCharSeqToChars(mPass.getText());
+            char[] passConf = CryptoHelper.fromCharSeqToChars(mPassConf.getText());
+            int i;
 
-        if(!Arrays.equals(pass, passConf)) {
-            //hmmm maybe use toast to bitch at the user that their passwords don't match
-            Toast toast = Toast.makeText(this, "Passwords do not match", Toast.LENGTH_LONG);
-            toast.show();
-            return false;
+            if(!Arrays.equals(pass, passConf)) {
+                Toast toast = Toast.makeText(this, "Passwords do not match", Toast.LENGTH_LONG);
+                toast.show();
+                return false;
+            }
+
+            //before we change anything, let's get all old contacts and decrypt them.
+            //then after changing password, we will go through contacts and update
+            //the encrypted fields in the database, with the newly encrypted values
+            //using the new key
+            Cursor contacts = mDbAdapter.getContacts();
+            contacts.moveToFirst(); //might be implicit, not sure
+            Hashtable[] tempContacts = new Hashtable[contacts.getCount()];
+            for(i = 0; i < contacts.getCount(); i++) {
+                tempContacts[i] = new Hashtable(4);
+                tempContacts[i].put("id", contacts.getLong(contacts.getColumnIndex(MarvinDbAdapter.KEY_ID)));
+                tempContacts[i].put("fname", CryptoHelper.decryptText(
+                            contacts.getString(contacts.getColumnIndex(MarvinDbAdapter.KEY_FIRST_NAME))));
+                tempContacts[i].put("lname", CryptoHelper.decryptText(
+                            contacts.getString(contacts.getColumnIndex(MarvinDbAdapter.KEY_LAST_NAME))));
+                tempContacts[i].put("num", CryptoHelper.decryptText(
+                            contacts.getString(contacts.getColumnIndex(MarvinDbAdapter.KEY_MOB_NUM))));
+                contacts.move(1);
+            }
+            //close our cursor right off the bat, sine we don't need it anymore
+            contacts.close();
+
+            //now we swap our keys
+            byte[] generatedSalt = CryptoHelper.generateSalt();
+            byte[] generatedHash = {};
+
+            try {
+                generatedHash = CryptoHelper.generateHash(pass, generatedSalt);
+            } catch (Exception e) {
+                Log.d(LOG_TAG, "createKey", e);
+            }
+
+            SharedPreferences.Editor editor = mSettings.edit();
+            editor.putString(KEY_PASS, CryptoHelper.toHexString(generatedHash));
+            editor.putString(KEY_SALT, CryptoHelper.toHexString(generatedSalt));
+            editor.commit();
+            mApp.unlockPassword = pass;
+
+            //recreate our ciphers then re-encrypt our contacts
+            //TODO: do a try catch block to rollback this on any error
+            CryptoHelper.genStorageCiphers(pass, generatedSalt);
+            for(i = 0; i < tempContacts.length; i++) {
+                mDbAdapter.updateContact((Long)tempContacts[i].get("id"),
+                        CryptoHelper.encryptText((CharSequence)tempContacts[i].get("fname")),
+                        CryptoHelper.encryptText((CharSequence)tempContacts[i].get("lname")),
+                        CryptoHelper.encryptText((CharSequence)tempContacts[i].get("num")));
+            }
         }
-
-        byte[] generatedSalt = CryptoHelper.generateSalt();
-        byte[] generatedHash = {};
-
-        try {
-            generatedHash = CryptoHelper.generateHash(pass, generatedSalt);
-        } catch (Exception e) {
-            Log.d(LOG_TAG, "createKey", e);
-        }
-
-        SharedPreferences.Editor editor = mSettings.edit();
-        editor.putString(KEY_PASS, CryptoHelper.toHexString(generatedHash));
-        editor.putString(KEY_SALT, CryptoHelper.toHexString(generatedSalt));
-        editor.commit();
-
         return true;
     }
 

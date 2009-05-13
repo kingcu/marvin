@@ -99,7 +99,24 @@ public class MarvinDbAdapter {
      */
     public Cursor getContact(long id) throws SQLException {
         Cursor cursor = mDb.query(true, CONTACTS_TABLE, new String[] {KEY_ID,
-            KEY_FIRST_NAME, KEY_LAST_NAME, KEY_MOB_NUM}, KEY_ID + "=" + id,
+            KEY_FIRST_NAME, KEY_LAST_NAME, KEY_MOB_NUM, KEY_PUB_KEY}, KEY_ID + "=" + id,
+            null, null, null, null, null);
+        if(cursor != null) {
+            cursor.moveToFirst();
+        }
+        return cursor;
+    }
+
+    /**
+     * pull a cursor for a single contact by number
+     *
+     * @param num the number of the desired contact
+     * @return cursor for the contact
+     * @throws SQLException if note could not be found
+     */
+    public Cursor getContactByNumber(CharSequence num) throws SQLException {
+        Cursor cursor = mDb.query(true, CONTACTS_TABLE, new String[] {KEY_ID,
+            KEY_FIRST_NAME, KEY_LAST_NAME, KEY_MOB_NUM, KEY_PUB_KEY}, KEY_MOB_NUM + "=" + num,
             null, null, null, null, null);
         if(cursor != null) {
             cursor.moveToFirst();
@@ -116,11 +133,12 @@ public class MarvinDbAdapter {
      * 
      * @return id or -1 if failed
      */
-    public long createContact(String fName, String lName, String num) {
+    public long createContact(String fName, String lName, String num, String key) {
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_NAME, fName);
         values.put(KEY_LAST_NAME, lName);
         values.put(KEY_MOB_NUM, num);
+        values.put(KEY_PUB_KEY, key);
 
         return mDb.insert(CONTACTS_TABLE, null, values);
     }
@@ -134,16 +152,34 @@ public class MarvinDbAdapter {
      *
      * @return true if updated, false if failed
      */
-    public boolean updateContact(long id, String fName, String lName, String num, boolean auth) {
+    public boolean updateContact(long id, String fName, String lName, String num) {
         ContentValues values = new ContentValues();
         values.put(KEY_FIRST_NAME, fName);
         values.put(KEY_LAST_NAME, lName);
         values.put(KEY_MOB_NUM, num);
-		values.put(KEY_IS_AUTH, auth);
 
         return mDb.update(CONTACTS_TABLE, values, KEY_ID + "=" + id, null) > 0;
     }
 
+    /**
+     * Update a contact
+     *
+     * @param fName contacts first name
+     * @param lName contacts last name
+     * @param num contacts mobile number
+     * @param auth whether contact is authenticated
+     *
+     * @return true if updated, false if failed
+     */
+    public boolean updateContact(long id, String fName, String lName, String num, String key) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_FIRST_NAME, fName);
+        values.put(KEY_LAST_NAME, lName);
+        values.put(KEY_MOB_NUM, num);
+		values.put(KEY_PUB_KEY, key);
+
+        return mDb.update(CONTACTS_TABLE, values, KEY_ID + "=" + id, null) > 0;
+    }
 	/**
 	 * delete a given contact
 	 *
@@ -163,7 +199,10 @@ public class MarvinDbAdapter {
         if(cursor != null) {
             cursor.moveToFirst();
         }
-		num = cursor.getString(cursor.getColumnIndex(KEY_MOB_NUM));
+
+        //TODO: again, move away from strings, this is geto and insecure.
+		num = (String)CryptoHelper.decryptText(cursor.getString(cursor.getColumnIndex(KEY_MOB_NUM)));
+        cursor.close();
 		
 		if(num.length() == 10) {
 			formattedNum = "(" + num.substring(0, 3) + ")" + num.substring(3,6) + "-" + num.substring(6);

@@ -5,7 +5,7 @@
 	android:versionName="1.0">
     <application android:label="@string/app_name"
         android:name=".MarvinApplication">
-		<activity android:name=".Marvin"
+		<activity android:name=".MarvinMessaging"
 			android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -41,6 +41,13 @@
 				<action android:name="android.intent.category.DEFAULT" />
 			</intent-filter>
 		</activity>
+		<activity android:name=".ViewMessage"
+			android:label="View Message">
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<action android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+        </activity>
 		<activity android:name=".ApplicationSettings"
 			android:label="Application Settings">
 			<intent-filter>
@@ -55,6 +62,8 @@
 				<action android:name="android.provider.Telephony.SMS_RECEIVED" />
 			</intent-filter>
 		</receiver>
+
+        <service android:name=".ReceivedMessageService" android:enabled="true" />
 	</application>
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />

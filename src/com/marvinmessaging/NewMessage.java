@@ -1,5 +1,8 @@
 package com.marvinmessaging;
 
+import java.util.Date;
+import java.lang.Long;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
@@ -9,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.content.Intent;
 import android.database.Cursor;
-import com.marvinmessaging.MarvinDbAdapter;
+import android.telephony.gsm.SmsManager;
 
 public class NewMessage extends Activity {
 	private TextView mMsgBody;
@@ -19,6 +22,9 @@ public class NewMessage extends Activity {
 	private Button mSubmitButton;
 	private MarvinDbAdapter mDbAdapter;
 	private Long mId;
+    private MarvinApplication mApp;
+    private CharSequence mNumber;
+    private char[] mSecret;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +32,7 @@ public class NewMessage extends Activity {
 		final Intent intent = getIntent();
 		final String action = intent.getAction();
 
+        mApp = (MarvinApplication)getApplication();
 		mDbAdapter = new MarvinDbAdapter(this);
 		mDbAdapter.open();
 
@@ -67,6 +74,10 @@ public class NewMessage extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+        long now = (new Date()).getTime();
+        if(mApp.unlockPassword == null || (now - mApp.lastActivity) > 60000)
+            mApp.requestPassword(this);
+        mApp.lastActivity = (new Date()).getTime();
 	}
 
 	@Override
@@ -93,19 +104,36 @@ public class NewMessage extends Activity {
 
 	private void sendMessage() {
 		//TODO: encrypt message, send to contact number!
+        CryptoHelper.genMessageCiphers(mSecret);
+        String cipherText = CryptoHelper.encryptMessageText(mMsgBody.getText());
+        SmsManager sm = SmsManager.getDefault();
+        //TODO: will casting to string be problematic with the whole immutable thing?
+        sm.sendTextMessage((String)mNumber, null, "?mm?" + cipherText, null, null);
 	}
 
 	private void populateForm() {
 		if(mId != null) {
 			Cursor contact = mDbAdapter.getContact(mId);
 			startManagingCursor(contact);
-			String fname = contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME));
-			String lname = contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME));
-			String num = contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM));
+			CharSequence fname = CryptoHelper.decryptText(
+                    contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME)));
+			CharSequence lname = CryptoHelper.decryptText(
+                    contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME)));
+			CharSequence num = CryptoHelper.decryptText(
+                    contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM)));
+            CharSequence secret = CryptoHelper.decryptText(
+                contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_PUB_KEY)));
+
 			
 			mName.setText(fname + " " + lname);
 			mNum.setText(mDbAdapter.getFormattedPhone(mId));
 			mAuthenticated.setText("Authenticated :)");
+
+            //TODO: this is insecure!  get rid of string inbetween.
+            mNumber = num;
+            mSecret = CryptoHelper.fromCharSeqToChars(secret);
+
+            contact.close();
 		}
 	}
 }

@@ -27,6 +27,7 @@ import android.content.DialogInterface;
 
 public class ContactList extends ListActivity {
     private MarvinDbAdapter mDbAdapter;
+    private MarvinApplication mApp;
 
     protected static final int MSG_CONTACT_ITEM = Menu.FIRST;
     protected static final int EDIT_CONTACT_ITEM = Menu.FIRST + 1;
@@ -36,6 +37,11 @@ public class ContactList extends ListActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mApp = (MarvinApplication)getApplication();
+        if(mApp.unlockPassword == null)
+            mApp.requestPassword(this);
+
         setContentView(R.layout.contact_list);
         
         mDbAdapter = new MarvinDbAdapter(this);
@@ -69,6 +75,17 @@ public class ContactList extends ListActivity {
 				menu.add(0, CANCEL_CONTACT_ITEM, 0, "Cancel");
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mDbAdapter.close();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -176,8 +193,8 @@ public class ContactList extends ListActivity {
             String lName = cursor.getString(cursor.getColumnIndex(MarvinDbAdapter.KEY_LAST_NAME));
             String fName = cursor.getString(cursor.getColumnIndex(MarvinDbAdapter.KEY_FIRST_NAME));
             String num = cursor.getString(cursor.getColumnIndex(MarvinDbAdapter.KEY_MOB_NUM));
-
-            nameView.setText(fName + " " + lName);
+            
+            nameView.setText(CryptoHelper.decryptText(fName) + " " + CryptoHelper.decryptText(lName));
             numView.setText(mDbAdapter.getFormattedPhone(cursor.getInt(cursor.getColumnIndex(MarvinDbAdapter.KEY_ID))));
         }
     }

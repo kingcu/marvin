@@ -44,6 +44,17 @@
             android:inputType="phone"
             android:singleLine="true" />
 
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:text="Shared secret key" />
+        <EditText android:id="@+id/contact_key"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:inputType="textPassword"
+            android:singleLine="true" />
+
         <Button android:id="@+id/contact_submit_button"
             android:text="@+string/contact_form_button"
             android:layout_width="wrap_content"

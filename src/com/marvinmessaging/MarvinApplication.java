@@ -7,6 +7,7 @@ import android.content.Intent;
 
 public class MarvinApplication extends Application {
     public char[] unlockPassword;
+    public long lastActivity = 0;
 
     public static final int PASSWORD_ACTIVITY_ID = 0;
 

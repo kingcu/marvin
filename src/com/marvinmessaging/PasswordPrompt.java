@@ -1,5 +1,6 @@
 package com.marvinmessaging;
 
+import android.util.Log;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
@@ -28,18 +29,22 @@ public class PasswordPrompt extends Activity {
         mApp = (MarvinApplication)getApplication();
 
         mSettings = getSharedPreferences(PREF_NAME, 0);
+        mHash = mSettings.getString(KEY_PASS, "");
+        mSalt = mSettings.getString(KEY_SALT, "");
+
         setContentView(R.layout.password_prompt);
 
         Button authButton = (Button)findViewById(R.id.auth_button);
         mPasswordField = (EditText)findViewById(R.id.auth_password_field);
-        mHash = mSettings.getString(KEY_PASS, "");
-        mSalt = mSettings.getString(KEY_SALT, "");
 
         authButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mPassword = CryptoHelper.fromCharSeqToChars(mPasswordField.getText());
+
                 if(CryptoHelper.checkPassword(mPassword, mHash, mSalt)) {
+                    byte[] salt = CryptoHelper.hexStringToBytes(mSalt);
                     mApp.unlockPassword = mPassword;
+                    CryptoHelper.genStorageCiphers(mPassword, salt);
                     setResult(Activity.RESULT_OK);
                     finish();
                 } else {
