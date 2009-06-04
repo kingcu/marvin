@@ -55,6 +55,8 @@ public class ViewMessage extends Activity {
     @Override protected void onResume() {
         super.onResume();
         mApp.lastActivity = (new Date()).getTime();
+        if(mApp.unlockPassword != null)
+            populateForm();
     }
 
     @Override protected void onPause() {
@@ -88,6 +90,12 @@ public class ViewMessage extends Activity {
 		MarvinDbAdapter dbAdapter = new MarvinDbAdapter(this);
 		dbAdapter.open();
         Cursor contact = dbAdapter.getContactByNumber(mNumber);
+        Log.i(MarvinApplication.LOG_TAG, mNumber);
+        if(contact.getCount() == 0) {
+            //geto way to strip a possible leading country code from the number
+            //since there may be a diff between stored and caller-id...GETO
+            contact = dbAdapter.getContactByNumber(mNumber.substring(1));
+        }
         if(contact.getCount() > 0) {
             mContactId = contact.getLong(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_ID));
             CharSequence key = CryptoHelper.decryptText(contact.getString(
@@ -103,7 +111,7 @@ public class ViewMessage extends Activity {
             mMessageNameText.setText(mName);
             mMessageBodyText.setText(mPlaintext);
         } else {
-            //do something else
+            mMessageBodyText.setText("Sorry, we were unable to find security information for the author of this message");
         }
         contact.close();
         dbAdapter.close();

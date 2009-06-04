@@ -39,8 +39,7 @@ public class ContactList extends ListActivity {
         super.onCreate(savedInstanceState);
 
         mApp = (MarvinApplication)getApplication();
-        if(mApp.unlockPassword == null)
-            mApp.requestPassword(this);
+        mApp.requestPassword(this);
 
         setContentView(R.layout.contact_list);
         

@@ -26,22 +26,17 @@ public class ApplicationSettings extends Activity {
     private EditText mPassConf;
     private SharedPreferences mSettings;
     private char[] mPassword;
-    private final String KEY_PASS = "pass";
-    private final String KEY_SALT = "salt";
-
-    private static final String LOG_TAG = "MarvinMessaging";
-    private static final String PREF_NAME = "MarvinMessagingPreferences";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
+        Log.i("MARVIN STUFF", "onCreate");
         super.onCreate(savedInstanceState);
         final Intent intent = getIntent();
         final String action = intent.getAction();
 
-        mSettings = getSharedPreferences(PREF_NAME, 0);
+        mSettings = getSharedPreferences(MarvinApplication.SETTINGS_KEY, 0);
         mApp = (MarvinApplication)getApplication();
-        if(mSettings.contains(KEY_PASS) && mApp.unlockPassword == null)
-            mApp.requestPassword(this);
+        mApp.requestPassword(this);
 
         mBundle = savedInstanceState;
         mDbAdapter = new MarvinDbAdapter(this);
@@ -67,9 +62,7 @@ public class ApplicationSettings extends Activity {
     protected void onResume() {
         super.onResume();
 
-        long now = (new Date()).getTime();
-        if(mApp.unlockPassword == null || (now - mApp.lastActivity) > 60000)
-            mApp.requestPassword(this);
+        mApp.requestPassword(this);
         mApp.lastActivity = (new Date()).getTime();
 
         populateForm(); //TODO: maybe do inline
@@ -132,12 +125,12 @@ public class ApplicationSettings extends Activity {
             try {
                 generatedHash = CryptoHelper.generateHash(pass, generatedSalt);
             } catch (Exception e) {
-                Log.d(LOG_TAG, "createKey", e);
+                Log.d(MarvinApplication.LOG_TAG, "createKey", e);
             }
 
             SharedPreferences.Editor editor = mSettings.edit();
-            editor.putString(KEY_PASS, CryptoHelper.toHexString(generatedHash));
-            editor.putString(KEY_SALT, CryptoHelper.toHexString(generatedSalt));
+            editor.putString(MarvinApplication.SETTINGS_KEY_PASS, CryptoHelper.toHexString(generatedHash));
+            editor.putString(MarvinApplication.SETTINGS_KEY_SALT, CryptoHelper.toHexString(generatedSalt));
             editor.commit();
             mApp.unlockPassword = pass;
 
@@ -157,14 +150,14 @@ public class ApplicationSettings extends Activity {
     }
 
     private void populateForm() {
-        String salt = mSettings.getString(KEY_SALT, "");
-        String hash = mSettings.getString(KEY_PASS, "");
+        String salt = mSettings.getString(MarvinApplication.SETTINGS_KEY_SALT, "");
+        String hash = mSettings.getString(MarvinApplication.SETTINGS_KEY_PASS, "");
 
         if(salt.length() > 0) {
             if(CryptoHelper.checkPassword("password".toCharArray(), hash, salt)) {
-                Log.i(LOG_TAG, "KEYS MATCH!");
+                Log.i(MarvinApplication.LOG_TAG, "KEYS MATCH!");
             } else {
-                Log.i(LOG_TAG, "KEYS DONT MATCH FUCK");
+                Log.i(MarvinApplication.LOG_TAG, "KEYS DONT MATCH FUCK");
             }
         }
     }

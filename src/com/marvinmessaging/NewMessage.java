@@ -3,6 +3,7 @@ package com.marvinmessaging;
 import java.util.Date;
 import java.lang.Long;
 
+import android.util.Log;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.View;
@@ -74,9 +75,7 @@ public class NewMessage extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-        long now = (new Date()).getTime();
-        if(mApp.unlockPassword == null || (now - mApp.lastActivity) > 60000)
-            mApp.requestPassword(this);
+        mApp.requestPassword(this);
         mApp.lastActivity = (new Date()).getTime();
 	}
 
@@ -115,24 +114,25 @@ public class NewMessage extends Activity {
 		if(mId != null) {
 			Cursor contact = mDbAdapter.getContact(mId);
 			startManagingCursor(contact);
-			CharSequence fname = CryptoHelper.decryptText(
-                    contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME)));
-			CharSequence lname = CryptoHelper.decryptText(
-                    contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME)));
-			String num = contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM));
-            CharSequence secret = CryptoHelper.decryptText(
-                contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_PUB_KEY)));
+            if(contact.getCount() > 0) {
+                CharSequence fname = CryptoHelper.decryptText(
+                        contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME)));
+                CharSequence lname = CryptoHelper.decryptText(
+                        contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME)));
+                String num = contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM));
+                CharSequence secret = CryptoHelper.decryptText(
+                        contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_PUB_KEY)));
 
-			
-			mName.setText(fname + " " + lname);
-			mNum.setText(mDbAdapter.getFormattedPhone(mId));
-			mAuthenticated.setText("Authenticated :)");
 
-            //TODO: this is insecure!  get rid of string inbetween.
-            mNumber = num;
-            mSecret = CryptoHelper.fromCharSeqToChars(secret);
+                mName.setText(fname + " " + lname);
+                mNum.setText(mDbAdapter.getFormattedPhone(mId));
+                mAuthenticated.setText("Authenticated :)");
 
+                //TODO: this is insecure!  get rid of string inbetween.
+                mNumber = num;
+                mSecret = CryptoHelper.fromCharSeqToChars(secret);
+            }
             contact.close();
-		}
+        }
 	}
 }

@@ -167,7 +167,7 @@ public class MarvinDbAdapter {
      * @param fName contacts first name
      * @param lName contacts last name
      * @param num contacts mobile number
-     * @param auth whether contact is authenticated
+     * @param key contacts shared key
      *
      * @return true if updated, false if failed
      */

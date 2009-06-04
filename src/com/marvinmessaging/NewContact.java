@@ -26,6 +26,7 @@ public class NewContact extends Activity {
     private int mState;
 	private Bundle mBundle;
     private MarvinApplication mApp;
+    private String mStoredHash = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +64,7 @@ public class NewContact extends Activity {
     protected void onResume() {
         super.onResume();
 
-        long now = (new Date()).getTime();
-        if(mApp.unlockPassword == null || (now - mApp.lastActivity) > 60000)
-            mApp.requestPassword(this);
+        mApp.requestPassword(this);
 
         if(mState == EDIT_STATE) { //we are editing a contact
             mSubmitButton.setText(getText(R.string.contact_form_button_edit));
@@ -122,29 +121,37 @@ public class NewContact extends Activity {
         char[] ckey = CryptoHelper.fromCharSeqToChars(mKey.getText());
         String fname = CryptoHelper.encryptText(cfname);
         String lname = CryptoHelper.encryptText(clname);
-        String key = CryptoHelper.encryptText(ckey);
         String num = mMobileNum.getText().toString();
+        String key = null;
+        
+        if(mStoredHash == null || ckey.length != mStoredHash.length())
+            key = CryptoHelper.encryptText(ckey);
 
-        Log.i("marvin", fname);
+        Log.i(MarvinApplication.LOG_TAG, fname);
         if(mId == null) { //new entry, create a new contact
 			long id = mDbAdapter.createContact(fname, lname, num, key);
 			if(id>0) {
 				mId = id;
 			}
         } else { //we are updating an existing contact
-            mDbAdapter.updateContact(mId, fname, lname, num, key);
+            if(key != null)
+                mDbAdapter.updateContact(mId, fname, lname, num, key);
+            else
+                mDbAdapter.updateContact(mId, fname, lname, num);
         }
     }
 
     private void populateForm() {
         if(mId != null) {
             Cursor contact = mDbAdapter.getContact(mId);
+            mStoredHash = contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_PUB_KEY));
 
             mFirstName.setText(CryptoHelper.decryptText(
                         contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_FIRST_NAME))));
             mLastName.setText(CryptoHelper.decryptText(
                         contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_LAST_NAME))));
             mMobileNum.setText(contact.getString(contact.getColumnIndexOrThrow(MarvinDbAdapter.KEY_MOB_NUM)));
+            mKey.setText(mStoredHash);
 
             contact.close();
         }

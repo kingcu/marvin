@@ -17,9 +17,6 @@ public class MarvinMessaging extends Activity {
     private Bundle mExtras;
     private MarvinApplication mApp;
     private SharedPreferences mSettings;
-    private static String KEY_PASS = "pass";
-    private static final int PASSWORD_ACTIVITY_ID = 0;
-    private static final String PREF_NAME = "MarvinMessagingPreferences";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,9 +24,9 @@ public class MarvinMessaging extends Activity {
         mActivity = this;
         mExtras = getIntent().getExtras();
         mApp = (MarvinApplication)getApplication();
-        mSettings = getSharedPreferences(PREF_NAME, 0);
+        mSettings = getSharedPreferences(MarvinApplication.SETTINGS_KEY, 0);
 
-        if(!mSettings.contains(KEY_PASS)) {
+        if(!mSettings.contains(MarvinApplication.SETTINGS_KEY_PASS)) {
             //first time this program is run....open settings dialog
             Intent intent = new Intent();
             intent.setClassName("com.marvinmessaging", "com.marvinmessaging.ApplicationSettings");
@@ -43,8 +40,7 @@ public class MarvinMessaging extends Activity {
     protected void onResume() {
         super.onResume();
         long now = (new Date()).getTime();
-        if(mApp.unlockPassword == null || (now - mApp.lastActivity) > 60000)
-            mApp.requestPassword(this);
+        mApp.requestPassword(this);
         mApp.lastActivity = (new Date()).getTime();
     }
 
